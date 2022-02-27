@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Simple Compose</string>
+    <string name="sign_in_with_phone">ចូលជាមួយលេខទូរសព្ទ</string>
+    <string name="we_happy_to_see_you_here">រីករាយដែលអ្នកមកដល់ចំណុចនេះ!</string>
+    <string name="jc_by_cloudware">ជ.ស រៀបចំដោយខ្លោដវែរ</string>
+    <string name="login_with_any_account_below">ចូលប្រើប្រាស់តាមរយៈគណនីខាងក្រោម</string>
+    <string name="sign_with_phone">ចូលប្រើជាមួយលេខទូរសព្ទ</string>
+    <string name="phone_signing">កំពុងដំណើរការ…</string>
+    <string name="power_by_cloudware">រក្សាសិទ្ធដោយ ខ្លោដវែរ</string>
+    <string name="sign_with_google">ចូលប្រើជាមួយ Google</string>
+    <string name="google_signing">កំពុងដំណើរការ…</string>
+    <string name="country_code">លេខកូដប្រទេស</string>
+    <string name="phone_number">លេខទូរសព្ទ</string>
+    <string name="opt_verify_code">បញ្ចាក់លេខកូដ ៦ ខ្ទង់</string>
+    <string name="send_verify_code">ផ្ញើរលេខកូដផ្ទៀងផ្ទាត់</string>
+    <string name="ok">យល់ព្រម</string>
+    <string name="cancel">ត្រលប់</string>
+    <string name="select_the_country">ជ្រើសរើសប្រទេស</string>
+    <string name="phone_number_is_invalid">លេខទូរសព្ទមិនត្រឹមត្រូវ!</string>
+    <string name="confirm_to_verify">បញ្ចាក់ដើម្បីផ្ទៀងផ្ទាត់</string>
+    <string name="phone_dialog_content">លេខកូដប្រទេស: %1$s \nលេខទូរសព្ទ: %2$s</string>
+    <string name="invalid_phone_number">លេខទូរសព្ទមិនត្រឹមត្រូវ</string>
+    <string name="must_be_9_or_10_char">លេខទូរសព្ទយ៉ាងតិច ៩ ទៅ ១០ ខ្ទង់</string>
+    <string name="code_must_be_6_char">លេខកូដត្រូវតែ ៦ ខ្ទង់</string>
+    <string name="require">តម្រូវការ</string>
+</resources>

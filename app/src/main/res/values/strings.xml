@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Simple Compose</string>
+    <string name="sign_in_with_phone">Sign in with Phone</string>
+    <string name="we_happy_to_see_you_here">We happy to see you here!</string>
+    <string name="jc_by_cloudware">JC by CloudWare</string>
+    <string name="login_with_any_account_below">Login with any account below</string>
+    <string name="sign_with_phone">Sign with Phone</string>
+    <string name="phone_signing">Phone signing…</string>
+    <string name="power_by_cloudware">Power by CloudWare</string>
+    <string name="sign_with_google">Sign with Google</string>
+    <string name="google_signing">Google Signing…</string>
+    <string name="country_code">Country code</string>
+    <string name="phone_number">Phone number</string>
+    <string name="opt_verify_code">OTP verify code</string>
+    <string name="send_verify_code">Send verify code</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="select_the_country">Select the Country</string>
+    <string name="phone_number_is_invalid">Phone number is invalid!</string>
+    <string name="confirm_to_verify">Confirm to verify</string>
+    <string name="phone_dialog_content">Country code: %1$s \nPhone number: %2$s</string>
+    <string name="invalid_phone_number">Invalid phone number</string>
+    <string name="must_be_9_or_10_char">Must be 9 or 10 characters</string>
+    <string name="code_must_be_6_char">Code must be 6 characters</string>
+    <string name="require">Require</string>
+</resources>

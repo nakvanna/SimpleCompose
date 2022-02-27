@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../../layout/compose-model-1645334480112.xml" value="0.2905405405405405" />
+        <entry key="../../../../../layout/compose-model-1645344006382.xml" value="0.3138888888888889" />
+        <entry key="../../../../../layout/compose-model-1645352788589.xml" value="0.2777777777777778" />
+        <entry key="../../../../../layout/compose-model-1645456580234.xml" value="0.2777777777777778" />
+        <entry key="../../../../../layout/compose-model-1645545495905.xml" value="0.5625" />
+        <entry key="../../../../../layout/compose-model-1645628554501.xml" value="0.19763513513513514" />
+        <entry key="../../../../../layout/compose-model-1645782315594.xml" value="1.0083333333333333" />
+        <entry key="../../../../../layout/compose-model-1645852298274.xml" value="2.0" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2425" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.2425" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.173" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.2425" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
