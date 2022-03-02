@@ -1,0 +1,253 @@
+input ArgCondition {
+  condition: Json
+}
+
+input CreateMediaPostInputType {
+  fileType: String!
+
+  fileUrl: String!
+
+  postId: ID
+}
+
+input CreatePostInputType {
+  content: String!
+
+  mediaPosts: [CreateMediaPostInputType]
+
+  status: String!
+
+  title: String!
+
+  userId: ID!
+}
+
+input CreateSessionInput {
+  emailOrUsername: String!
+
+  password: String!
+}
+
+input CreateUserInputType {
+  email: String!
+
+  name: String!
+
+  password: String!
+
+  passwordConfirmation: String!
+
+  profile: String
+
+  username: String!
+}
+
+"""
+The `Json` scalar type represents arbitrary json string data, represented as UTF-8
+character sequences. The Json type is most often used to represent a free-form
+human-readable json string.
+"""
+scalar Json
+
+type MediaPost {
+  fileType: String
+
+  fileUrl: String
+
+  id: ID
+
+  message: String
+
+  post: Post
+
+  postId: ID
+
+  success: Boolean
+}
+
+type MediaPostConnection {
+  count: Int
+
+  edges: [MediaPostEdge]
+
+  pageInfo: PageInfo!
+}
+
+type MediaPostEdge {
+  cursor: String
+
+  node: MediaPost
+}
+
+type RootMutationType {
+  createMediaPost(data: CreateMediaPostInputType!): MediaPost
+
+  createPost(data: CreatePostInputType!): Post
+
+  createUser(data: CreateUserInputType!): User
+
+  deleteMediaPost(id: ID): MediaPost
+
+  deletePost(id: ID): Post
+
+  deleteUser(id: ID): User
+
+  login(data: CreateSessionInput!): Session
+
+  updateMediaPost(data: UpdateMediaPostInputType, id: ID): MediaPost
+
+  updatePost(data: UpdatePostInputType, id: ID): Post
+
+  updateUser(data: UpdateUserInputType, id: ID): User
+}
+
+type PageInfo {
+  """
+  When paginating forwards, the cursor to continue.
+  """
+  endCursor: String
+
+  """
+  When paginating forwards, are there more items?
+  """
+  hasNextPage: Boolean!
+
+  """
+  When paginating backwards, are there more items?
+  """
+  hasPreviousPage: Boolean!
+
+  """
+  When paginating backwards, the cursor to continue.
+  """
+  startCursor: String
+}
+
+type Post {
+  content: String
+
+  id: ID
+
+  mediaPosts: [MediaPost]
+
+  message: String
+
+  status: String
+
+  success: Boolean
+
+  title: String
+
+  user: User
+
+  userId: ID
+}
+
+type PostConnection {
+  count: Int
+
+  edges: [PostEdge]
+
+  pageInfo: PageInfo!
+}
+
+type PostEdge {
+  cursor: String
+
+  node: Post
+}
+
+type RootQueryType {
+  findMediaPost(id: ID): MediaPost
+
+  findPost(id: ID): Post
+
+  findUser(id: ID): User
+
+  mediaPosts(after: String, before: String, condition: Json!, first: Int, last: Int): MediaPostConnection
+
+  posts(after: String, before: String, condition: Json!, first: Int, last: Int, orderBy: String, userArg: ArgCondition!): PostConnection
+
+  users(after: String, before: String, condition: Json!, first: Int, last: Int): UserConnection
+}
+
+type Session {
+  token: String
+
+  user: User
+}
+
+input UpdateMediaPostInputType {
+  fileType: String
+
+  fileUrl: String
+
+  postId: ID
+}
+
+input UpdatePostInputType {
+  content: String
+
+  status: String
+
+  title: String
+
+  userId: ID
+}
+
+input UpdateUserInputType {
+  email: String
+
+  name: String
+
+  password: String
+
+  passwordConfirmation: String
+
+  profile: String
+
+  role: String
+
+  username: String
+
+  verify: Boolean
+}
+
+type User {
+  email: String
+
+  id: ID
+
+  message: String
+
+  name: String
+
+  profile: String
+
+  role: String
+
+  success: Boolean
+
+  username: String
+
+  verify: Boolean
+}
+
+type UserConnection {
+  count: Int
+
+  edges: [UserEdge]
+
+  pageInfo: PageInfo!
+}
+
+type UserEdge {
+  cursor: String
+
+  node: User
+}
+
+schema {
+  query: RootQueryType
+  mutation: RootMutationType
+}

@@ -2,6 +2,14 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
+    id("com.apollographql.apollo3").version("3.1.0")
+    id("dagger.hilt.android.plugin")
+}
+
+apply plugin: 'kotlin-kapt'
+
+apollo {
+    packageName.set("com.example.simplecompose")
 }
 
 android {
@@ -9,7 +17,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.simplecompose"
-        minSdk 21
+        minSdk 23
         targetSdk 31
         versionCode 1
         versionName "1.0"
@@ -47,15 +55,18 @@ android {
 }
 
 dependencies {
-
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
     implementation 'androidx.activity:activity-compose:1.4.0'
+
     //Firebase
     implementation 'com.google.firebase:firebase-analytics-ktx:20.1.0'
     implementation 'com.google.firebase:firebase-auth-ktx:21.0.1'
     implementation platform('com.google.firebase:firebase-bom:29.1.0')
     implementation 'com.google.android.gms:play-services-auth:20.1.0'
+
+    //AppCampat
+    implementation 'androidx.appcompat:appcompat:1.4.1'
 
     //Compose
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
@@ -65,12 +76,29 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:$nav_version"
     implementation "com.google.accompanist:accompanist-navigation-animation:0.24.2-alpha"
 
+    //Apollo client
+    implementation("com.apollographql.apollo3:apollo-runtime:3.1.0")
+
     //Coil
     implementation "io.coil-kt:coil-gif:1.4.0"
     implementation "io.coil-kt:coil-compose:1.4.0"
+
+    //Dependency injection
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
+
+    //Activity KTX for viewModels()
+    implementation("androidx.activity:activity-ktx:$activity_version")
+
     //Test
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }

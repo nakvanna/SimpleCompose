@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import com.example.simplecompose.R
-import com.example.simplecompose.ui.theme.CustomFontFamily
+import com.example.simplecompose.core.theme.CustomFontFamily
 
 @Composable
 fun PowerByCloudWare() {

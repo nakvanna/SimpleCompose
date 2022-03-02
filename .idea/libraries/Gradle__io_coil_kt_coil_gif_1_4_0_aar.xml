@@ -1,9 +1,10 @@
 <component name="libraryTable">
   <library name="Gradle: io.coil-kt:coil-gif:1.4.0@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/fd71eb49178a804fdee974153e54dda2/transformed/coil-gif-1.4.0/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-3/fd71eb49178a804fdee974153e54dda2/transformed/coil-gif-1.4.0/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/fd71eb49178a804fdee974153e54dda2/transformed/coil-gif-1.4.0/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/4bf2635d710bb2653369db28516ffe8e/transformed/coil-gif-1.4.0/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/4bf2635d710bb2653369db28516ffe8e/transformed/coil-gif-1.4.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/4bf2635d710bb2653369db28516ffe8e/transformed/coil-gif-1.4.0/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.coil-kt/coil-gif/1.4.0/5351460380b767612b51c52fd8343296a5b483e5/coil-gif-1.4.0-javadoc.jar!/" />

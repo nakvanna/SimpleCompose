@@ -27,15 +27,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavHostController
 import com.example.simplecompose.R
+import com.example.simplecompose.core.theme.CustomAnimate
+import com.example.simplecompose.core.theme.CustomFontFamily
+import com.example.simplecompose.core.theme.SimpleComposeTheme
 import com.example.simplecompose.presentation.ScreenRoute
+import com.example.simplecompose.presentation.auth.phone.widget.CountryCodePicker
 import com.example.simplecompose.ui.reusable.ImageBackground
 import com.example.simplecompose.ui.reusable.PowerByCloudWare
-import com.example.simplecompose.ui.theme.CustomFontFamily
-import com.example.simplecompose.ui.theme.SimpleComposeTheme
-import com.example.simplecompose.ui.widgets.CircleImage
+import com.example.simplecompose.ui.widgets.CircleImageRes
 import com.example.simplecompose.ui.widgets.OutlineButtonWithIcon
-import com.example.simplecompose.util.CountryCodePicker
-import com.example.simplecompose.util.CustomAnimate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -118,7 +118,7 @@ fun PhoneSignInScreen(navHostController: NavHostController) {
                             modifier = Modifier
                                 .fillMaxWidth()
                         ) {
-                            CircleImage(
+                            CircleImageRes(
                                 image = R.drawable.cloudware,
                                 modifier = Modifier.size(128.dp)
                             )

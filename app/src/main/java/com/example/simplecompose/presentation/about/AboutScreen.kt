@@ -5,7 +5,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import com.example.simplecompose.ui.theme.SimpleComposeTheme
+import com.example.simplecompose.core.theme.SimpleComposeTheme
 
 @Composable
 fun AboutScreen(navHostController: NavHostController) {

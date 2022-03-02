@@ -23,4 +23,5 @@
     <string name="must_be_9_or_10_char">Must be 9 or 10 characters</string>
     <string name="code_must_be_6_char">Code must be 6 characters</string>
     <string name="require">Require</string>
+    <string name="html_text" translatable="false">%1$s</string>
 </resources>

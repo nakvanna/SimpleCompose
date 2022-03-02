@@ -5,13 +5,10 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import com.example.simplecompose.core.theme.CustomAnimate
 import com.example.simplecompose.presentation.ScreenRoute
 import com.example.simplecompose.presentation.about.AboutScreen
 import com.example.simplecompose.presentation.auth.AuthScreen
@@ -22,22 +19,33 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import javax.inject.Named
 
 @ExperimentalAnimationApi
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private lateinit var auth: FirebaseAuth
+
+    @Inject
+    @Named("firebase_auth")
+    lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        auth = FirebaseAuth.getInstance()
-        val isLogin: Boolean = auth.currentUser != null
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+        val isLogin: Boolean = firebaseAuth.currentUser != null
         setContent {
             val navHostController = rememberAnimatedNavController()
-            Navigation(navHostController, isLogin)
+            Navigation(
+                navHostController = navHostController,
+                isLogin = isLogin,
+            )
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
@@ -49,17 +57,10 @@ fun Navigation(
         startDestination = if (isLogin) ScreenRoute.HomeScreen.route else ScreenRoute.LoginScreen.route,
         navController = navHostController,
         enterTransition = {
-            slideInHorizontally(
-                initialOffsetX = { it },
-                animationSpec = tween(durationMillis = 300)
-            )
+            CustomAnimate.slideInRight
         },
         popEnterTransition = {
-            slideInVertically(
-                animationSpec = tween(durationMillis = 300)
-            ) {
-                -it
-            } + fadeIn()
+            CustomAnimate.scaleIn
         }
     ) {
         composable(route = ScreenRoute.LoginScreen.route) {
