@@ -39,7 +39,13 @@ class PhoneSignInViewModel(application: Application) : AndroidViewModel(applicat
                      user action.*/
                 Log.d(ContentValues.TAG, "onVerificationCompleted:$credential")
                 viewModelScope.launch {
-                    signInWithPhoneAuthCredential(credential)
+                    signInWithPhoneAuthCredential(credential).addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            Log.i("Phone", "Auto sign in with credential successful")
+                        } else {
+                            Log.i("Phone", "Auto sign in with credential failure")
+                        }
+                    }
                 }
             }
 
