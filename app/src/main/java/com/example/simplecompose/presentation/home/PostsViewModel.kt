@@ -11,6 +11,7 @@ import com.example.simplecompose.domain.use_case.post.GetPosts
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
@@ -36,10 +37,11 @@ class PostsViewModel @Inject constructor(
         channel.trySend(Unit)
         viewModelScope.launch {
             for (item in channel) {
+                Log.d("QR", "Request")
                 val response = try {
                     postsUseCase(count)
                 } catch (e: ApolloException) {
-                    Log.d("QueryList", "Failure", e)
+                    Log.d("QR", "Failure", e)
                     return@launch
                 }
                 val newPosts = response.data?.posts?.edges?.filterNotNull()
@@ -48,6 +50,7 @@ class PostsViewModel @Inject constructor(
                     _isFetching.value = false
                 }
                 if (count >= response.data?.posts?.count ?: 5) {
+                    Log.d("QR", "Breaking")
                     channel.close()
                     break
                 }
@@ -62,8 +65,12 @@ class PostsViewModel @Inject constructor(
     fun onScrollingPositionChange(index: Int) {
         if (index == (count - 1) && !_isFetching.value) {
             _isFetching.value = true
-            count += 5 //Good for graphql pagination
-            channel.trySend(Unit)
+            viewModelScope.launch {
+                delay(2000)
+                Log.d("QR", "Increment count")
+                count += 5 //Good for graphql pagination
+                channel.trySend(Unit)
+            }
         }
     }
 }

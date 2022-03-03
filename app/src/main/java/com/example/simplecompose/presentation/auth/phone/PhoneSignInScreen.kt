@@ -331,8 +331,8 @@ fun PhoneSignInScreen(navHostController: NavHostController) {
                             onClick = {
                                 scope.launch {
                                     viewModel.onVerifyPhoneNumber(
-                                        activity,
-                                        "$countyCodeSelect $phoneNumberText"
+                                        activity = activity,
+                                        phoneNumber = "$countyCodeSelect $phoneNumberText"
                                     )
                                     confirmDialog = false
                                     phoneNumberTextVisible = false

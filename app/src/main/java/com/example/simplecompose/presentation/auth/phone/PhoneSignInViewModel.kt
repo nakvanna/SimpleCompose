@@ -2,7 +2,6 @@ package com.example.simplecompose.presentation.auth.phone
 
 import android.app.Activity
 import android.app.Application
-import android.content.ContentValues
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
@@ -37,7 +36,7 @@ class PhoneSignInViewModel(application: Application) : AndroidViewModel(applicat
                  2 - Auto-retrieval. On some devices Google Play services can automatically
                      detect the incoming verification SMS and perform verification without
                      user action.*/
-                Log.d(ContentValues.TAG, "onVerificationCompleted:$credential")
+                Log.d("Phone", "onVerificationCompleted:$credential")
                 viewModelScope.launch {
                     signInWithPhoneAuthCredential(credential).addOnCompleteListener {
                         if (it.isSuccessful) {
@@ -52,7 +51,7 @@ class PhoneSignInViewModel(application: Application) : AndroidViewModel(applicat
             override fun onVerificationFailed(e: FirebaseException) {
                 // This callback is invoked in an invalid request for verification is made,
                 // for instance if the the phone number format is not valid.
-                Log.w(ContentValues.TAG, "onVerificationFailed", e)
+                Log.i("Phone", "onVerificationFailed", e)
 
                 if (e is FirebaseAuthInvalidCredentialsException) {
                     // Invalid request
@@ -72,7 +71,7 @@ class PhoneSignInViewModel(application: Application) : AndroidViewModel(applicat
                 // The SMS verification code has been sent to the provided phone number, we
                 // now need to ask the user to enter the code and then construct a credential
                 // by combining the code with a verification ID.
-                Log.d(ContentValues.TAG, "onCodeSent:$verificationId")
+                Log.i("Phone", "onCodeSent: $verificationId")
 
                 // Save verification ID and resending token so we can use them later
                 storedVerificationId = verificationId
