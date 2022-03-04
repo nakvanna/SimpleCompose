@@ -2,7 +2,7 @@ package com.example.simplecompose.domain.use_case.google
 
 import android.app.Activity
 import android.content.Intent
-import com.example.simplecompose.domain.repository.SignInGoogleRepo
+import com.example.simplecompose.domain.repository.GoogleSignInRepo
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
@@ -13,7 +13,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 class SignInGoogle(
     private val activity: Activity,
     private val clientId: String
-) : SignInGoogleRepo {
+) : GoogleSignInRepo {
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     override suspend fun googleSignInIntent(): Intent {

@@ -1,5 +1,6 @@
 package com.example.simplecompose
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -31,6 +32,7 @@ class MainActivity : ComponentActivity() {
     @Named("firebase_auth")
     lateinit var firebaseAuth: FirebaseAuth
 
+    @SuppressLint("HardwareIds", "MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);

@@ -8,14 +8,17 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -23,7 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavHostController
 import com.example.simplecompose.R
@@ -41,7 +44,10 @@ import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
 @Composable
-fun PhoneSignInScreen(navHostController: NavHostController) {
+fun PhoneSignInScreen(
+    navHostController: NavHostController,
+    viewModel: PhoneSignInViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val config = LocalConfiguration.current
     val activity = LocalContext.current as Activity
@@ -70,8 +76,13 @@ fun PhoneSignInScreen(navHostController: NavHostController) {
 
     var isSendVerifyBtn by remember { mutableStateOf(true) }
 
-    val viewModel = ViewModelProvider(viewModelStoreOwner)[PhoneSignInViewModel::class.java]
 
+    //Get sim number
+    var getPhoneNumberDialog by remember { mutableStateOf(true) }
+    var simNumber = "0969392312"
+
+    //ViewModel
+//    val viewModel = ViewModelProvider(viewModelStoreOwner)[PhoneSignInViewModel::class.java]
     LaunchedEffect(rememberScaffoldState()) {
         delay(100)
         headerVisible = true
@@ -170,9 +181,10 @@ fun PhoneSignInScreen(navHostController: NavHostController) {
                                         onValueChange = {
                                             phoneNumberText = it
                                             phoneNumberIsError =
-                                                !viewModel.phoneInputValidation(it).isNullOrEmpty()
+                                                !viewModel.phoneInputValidation(context, it)
+                                                    .isNullOrEmpty()
                                             phoneNumberValidation =
-                                                viewModel.phoneInputValidation(it)
+                                                viewModel.phoneInputValidation(context, it)
                                         },
                                         shape = MaterialTheme.shapes.small,
                                         label = { Text(stringResource(R.string.phone_number)) },
@@ -213,10 +225,12 @@ fun PhoneSignInScreen(navHostController: NavHostController) {
                                     onValueChange = {
                                         otpText = it
                                         otpIsError =
-                                            !viewModel.otpInputValidation(it).isNullOrEmpty()
+                                            !viewModel.otpInputValidation(context, it)
+                                                .isNullOrEmpty()
                                         otpValidation =
-                                            viewModel.otpInputValidation(it)
+                                            viewModel.otpInputValidation(context, it)
                                     },
+                                    singleLine = true,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     shape = MaterialTheme.shapes.small,
                                     label = { Text(stringResource(R.string.opt_verify_code)) },
@@ -262,26 +276,27 @@ fun PhoneSignInScreen(navHostController: NavHostController) {
                                             } else {
                                                 signLoading = true
                                                 if (!otpIsError) {
-                                                    viewModel.onVerifyOtpCode(otpText)
-                                                        .addOnCompleteListener {
-                                                            if (it.isSuccessful) {
-                                                                signLoading = false
-                                                                navHostController.navigate(
-                                                                    ScreenRoute.HomeScreen.route
-                                                                ) {
-                                                                    popUpTo(ScreenRoute.HomeScreen.route) {
-                                                                        inclusive = true
-                                                                    }
+                                                    viewModel.onVerifyOtpCode(
+                                                        otp = otpText,
+                                                        onSuccess = {
+                                                            signLoading = false
+                                                            navHostController.navigate(
+                                                                ScreenRoute.HomeScreen.route
+                                                            ) {
+                                                                popUpTo(ScreenRoute.HomeScreen.route) {
+                                                                    inclusive = true
                                                                 }
-                                                            } else {
-                                                                signLoading = false
-                                                                Toast.makeText(
-                                                                    context,
-                                                                    "Code invalid",
-                                                                    Toast.LENGTH_LONG
-                                                                ).show()
                                                             }
+                                                        },
+                                                        onError = {
+                                                            signLoading = false
+                                                            Toast.makeText(
+                                                                context,
+                                                                "Code invalid",
+                                                                Toast.LENGTH_LONG
+                                                            ).show()
                                                         }
+                                                    )
                                                 }
                                             }
                                         }
@@ -356,6 +371,86 @@ fun PhoneSignInScreen(navHostController: NavHostController) {
                             onClick = {
                                 confirmDialog = false
                                 signLoading = false
+                            }
+                        ) {
+                            Text(
+                                stringResource(R.string.cancel),
+                                style = MaterialTheme.typography.button.copy(
+                                    fontFamily = CustomFontFamily.BattambangBold
+                                )
+                            )
+                        }
+                    }
+                )
+            }
+
+            if (getPhoneNumberDialog) {
+                AlertDialog(
+                    onDismissRequest = {
+                        getPhoneNumberDialog = false
+                    },
+                    title = {
+                        Text(
+                            text = "Continue with",
+                            style = MaterialTheme.typography.h6.copy(
+                                fontFamily = CustomFontFamily.BayonRegular,
+                            ),
+                            modifier = Modifier.padding(bottom = 28.dp)
+                        )
+                    },
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Card(
+                                shape = CircleShape,
+                                modifier = Modifier
+                                    .size(40.dp),
+                                backgroundColor = Color.Gray
+                            ) {
+                                Box(
+                                    modifier = Modifier.padding(4.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Phone,
+                                        contentDescription = "Phone",
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(20.dp))
+                            Text(
+                                text = simNumber,
+                                style = MaterialTheme.typography.body1.copy(
+                                    fontFamily = CustomFontFamily.BattambangRegular
+                                )
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                phoneNumberText = simNumber
+                                phoneNumberIsError =
+                                    !viewModel.phoneInputValidation(context, simNumber)
+                                        .isNullOrEmpty()
+                                phoneNumberValidation =
+                                    viewModel.phoneInputValidation(context, simNumber)
+                                getPhoneNumberDialog = false
+                            }
+                        ) {
+                            Text(
+                                stringResource(R.string.ok),
+                                style = MaterialTheme.typography.button.copy(
+                                    fontFamily = CustomFontFamily.BattambangBold
+                                )
+                            )
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                getPhoneNumberDialog = false
                             }
                         ) {
                             Text(

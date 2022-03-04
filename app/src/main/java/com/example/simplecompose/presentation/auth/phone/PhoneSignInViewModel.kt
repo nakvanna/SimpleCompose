@@ -1,31 +1,37 @@
 package com.example.simplecompose.presentation.auth.phone
 
 import android.app.Activity
-import android.app.Application
+import android.content.Context
 import android.util.Log
 import android.util.Patterns
-import android.widget.Toast
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simplecompose.R
-import com.example.simplecompose.domain.repository.SignInPhoneRepo
-import com.google.android.gms.tasks.Task
+import com.example.simplecompose.domain.use_case.phone.VerifyOtpCode
+import com.example.simplecompose.domain.use_case.phone.VerifyPhoneNumber
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
-import com.google.firebase.auth.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthProvider
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Named
 
-class PhoneSignInViewModel(application: Application) : AndroidViewModel(application),
-    SignInPhoneRepo {
-    private val context by lazy { getApplication<Application>().applicationContext }
-    private var auth: FirebaseAuth = FirebaseAuth.getInstance()
+@HiltViewModel
+class PhoneSignInViewModel @Inject constructor(
+    @Named("verify_phone_number") private val verifyPhoneNumberUseCase: VerifyPhoneNumber,
+    @Named("verify_otp_code") private val verifyOtpCodeUseCase: VerifyOtpCode,
+    @Named("firebase_auth") private val firebaseAuth: FirebaseAuth
+) : ViewModel() {
     private var storedVerificationId: String? = ""
     private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
     private var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
 
     init {
-        auth.setLanguageCode("en")
+        firebaseAuth.setLanguageCode("en")
 
         callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
@@ -38,7 +44,7 @@ class PhoneSignInViewModel(application: Application) : AndroidViewModel(applicat
                      user action.*/
                 Log.d("Phone", "onVerificationCompleted:$credential")
                 viewModelScope.launch {
-                    signInWithPhoneAuthCredential(credential).addOnCompleteListener {
+                    firebaseAuth.signInWithCredential(credential).addOnCompleteListener {
                         if (it.isSuccessful) {
                             Log.i("Phone", "Auto sign in with credential successful")
                         } else {
@@ -55,10 +61,10 @@ class PhoneSignInViewModel(application: Application) : AndroidViewModel(applicat
 
                 if (e is FirebaseAuthInvalidCredentialsException) {
                     // Invalid request
-                    makeToast("Invalid request")
+                    Log.i("Phone", "Invalid request")
                 } else if (e is FirebaseTooManyRequestsException) {
                     // The SMS quota for the project has been exceeded
-                    makeToast("The SMS quota for the project has been exceeded")
+                    Log.i("Phone", "The SMS quota for the project has been exceeded")
                 }
 
                 // Show a message and update the UI
@@ -80,30 +86,35 @@ class PhoneSignInViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    private fun makeToast(msg: String) {
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    fun onVerifyPhoneNumber(activity: Activity, phoneNumber: String) {
+        viewModelScope.launch {
+            verifyPhoneNumberUseCase(
+                phoneNumber = phoneNumber,
+                callbacks = callbacks,
+                firebaseAuth = firebaseAuth,
+                activity = activity
+            )
+        }
     }
 
-    override suspend fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential): Task<AuthResult> {
-        return auth.signInWithCredential(credential)
+    fun onVerifyOtpCode(otp: String, onSuccess: () -> Unit = {}, onError: () -> Unit = {}) {
+        viewModelScope.launch {
+            verifyOtpCodeUseCase(
+                storedVerificationId = storedVerificationId,
+                code = otp,
+                firebaseAuth = firebaseAuth
+            ).addOnCompleteListener {
+                if (it.isSuccessful) {
+                    onSuccess()
+                } else {
+                    onError()
+                }
+            }
+        }
     }
 
-    override suspend fun onVerifyPhoneNumber(activity: Activity, phoneNumber: String) {
-        val options = PhoneAuthOptions.newBuilder(auth)
-            .setPhoneNumber(phoneNumber)       // Phone number to verify
-            .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
-            .setActivity(activity)                 // Activity (for callback binding)
-            .setCallbacks(callbacks)          // OnVerificationStateChangedCallbacks
-            .build()
-        PhoneAuthProvider.verifyPhoneNumber(options)
-    }
 
-    override suspend fun onVerifyOtpCode(code: String): Task<AuthResult> {
-        val credential = PhoneAuthProvider.getCredential(storedVerificationId!!, code)
-        return signInWithPhoneAuthCredential(credential)
-    }
-
-    override fun phoneInputValidation(value: String): String? {
+    fun phoneInputValidation(context: Context, value: String): String? {
         val validRange = value.length !in 9..10
         if (!Patterns.PHONE.matcher(value).matches()) {
             return context.getString(R.string.invalid_phone_number)
@@ -113,7 +124,7 @@ class PhoneSignInViewModel(application: Application) : AndroidViewModel(applicat
         return null
     }
 
-    override fun otpInputValidation(value: String): String? {
+    fun otpInputValidation(context: Context, value: String): String? {
         val validLength = value.length == 6
         if (!validLength) {
             return context.getString(R.string.code_must_be_6_char)
