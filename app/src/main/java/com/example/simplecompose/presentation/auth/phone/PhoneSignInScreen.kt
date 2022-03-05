@@ -2,46 +2,41 @@ package com.example.simplecompose.presentation.auth.phone
 
 import android.app.Activity
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavHostController
 import com.example.simplecompose.R
 import com.example.simplecompose.core.theme.CustomAnimate
 import com.example.simplecompose.core.theme.CustomFontFamily
 import com.example.simplecompose.core.theme.SimpleComposeTheme
 import com.example.simplecompose.presentation.ScreenRoute
-import com.example.simplecompose.presentation.auth.phone.widget.CountryCodePicker
+import com.example.simplecompose.presentation.auth.phone.widget.OtpTextField
+import com.example.simplecompose.presentation.auth.phone.widget.PhoneNumberTextField
+import com.example.simplecompose.presentation.auth.widget.AuthHeader
 import com.example.simplecompose.ui.reusable.ImageBackground
 import com.example.simplecompose.ui.reusable.PowerByCloudWare
-import com.example.simplecompose.ui.widgets.CircleImageRes
-import com.example.simplecompose.ui.widgets.OutlineButtonWithIcon
+import com.example.simplecompose.ui.widget.OutlineButtonWithIcon
+import com.example.simplecompose.ui.widget.TextBtn
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalComposeUiApi::class)
 @ExperimentalMaterialApi
 @Composable
 fun PhoneSignInScreen(
@@ -51,39 +46,56 @@ fun PhoneSignInScreen(
     val context = LocalContext.current
     val config = LocalConfiguration.current
     val activity = LocalContext.current as Activity
+    val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
-    val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
-        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
-    }
 
     var signLoading by remember { mutableStateOf(false) }
     var headerVisible by remember { mutableStateOf(false) }
     var btnVerifyVisible by remember { mutableStateOf(false) }
 
-    var countyCodeSelect by remember { mutableStateOf("+855") }
-
+    //Phone number outline text field
     var phoneNumberTextVisible by remember { mutableStateOf(false) }
-    var phoneNumberIsError by remember { mutableStateOf(true) }
-    var phoneNumberText by remember { mutableStateOf("") }
-    var phoneNumberValidation: String? by remember { mutableStateOf(null) }
+    var fullPhoneNumber by remember { mutableStateOf("+855 ") }
 
+    //Otp code outline text field
     var otpTextVisible by remember { mutableStateOf(false) }
-    var otpIsError by remember { mutableStateOf(true) }
     var otpText by remember { mutableStateOf("") }
-    var otpValidation: String? by remember { mutableStateOf(null) }
 
+    //Phone number confirm to send code
     var confirmDialog by remember { mutableStateOf(false) }
 
     var isSendVerifyBtn by remember { mutableStateOf(true) }
 
+    //Countdown timer
+    var timeOut by remember { mutableStateOf(60 * 1000) }
+    var isTimerRunning by remember { mutableStateOf(false) }
+    var timeLeft by remember { mutableStateOf(60) }
 
-    //Get sim number
-    var getPhoneNumberDialog by remember { mutableStateOf(true) }
-    var simNumber = "0969392312"
+    LaunchedEffect(key1 = timeOut, key2 = isTimerRunning) {
+        if (timeOut > 0 && isTimerRunning) {
+            delay(1000)
+            timeOut -= 1000
+            timeLeft = timeOut / 1000
+        }
+    }
 
-    //ViewModel
-//    val viewModel = ViewModelProvider(viewModelStoreOwner)[PhoneSignInViewModel::class.java]
-    LaunchedEffect(rememberScaffoldState()) {
+    //Real device auto sign in without verify otp code
+    viewModel.autoSignInCredentialSuccess = {
+        signLoading = false
+        navHostController.navigate(
+            ScreenRoute.HomeScreen.route
+        ) {
+            popUpTo(ScreenRoute.HomeScreen.route) {
+                inclusive = true
+            }
+        }
+    }
+    viewModel.autoSignInCredentialFailure = {
+        Log.i("Phone", "Auto sign in with credential failure")
+    }
+
+    //Init Animation
+    LaunchedEffect(key1 = rememberScaffoldState()) {
         delay(100)
         headerVisible = true
         delay(100)
@@ -104,6 +116,7 @@ fun PhoneSignInScreen(
             navHostController.popBackStack()
         }
     }
+
     SimpleComposeTheme {
         Surface {
             Box(
@@ -111,7 +124,7 @@ fun PhoneSignInScreen(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                ImageBackground()
+                ImageBackground() //Background image gif
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceBetween,
@@ -124,33 +137,10 @@ fun PhoneSignInScreen(
                         enter = CustomAnimate.scaleIn,
                         exit = CustomAnimate.scaleOut
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            CircleImageRes(
-                                image = R.drawable.cloudware,
-                                modifier = Modifier.size(128.dp)
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = stringResource(R.string.sign_in_with_phone),
-                                style = TextStyle(
-                                    fontSize = MaterialTheme.typography.h4.fontSize,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = CustomFontFamily.AngkorRegular,
-                                    background = MaterialTheme.colors.background
-                                ),
-                            )
-                            Text(
-                                text = stringResource(R.string.we_happy_to_see_you_here),
-                                style = MaterialTheme.typography.subtitle1.copy(
-                                    fontFamily = CustomFontFamily.BayonRegular,
-                                    background = MaterialTheme.colors.background
-                                )
-                            )
-                        }
+                        AuthHeader(
+                            title = stringResource(R.string.sign_in_with_phone),
+                            caption = stringResource(R.string.we_happy_to_see_you_here)
+                        )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Column(
@@ -163,148 +153,127 @@ fun PhoneSignInScreen(
                             enter = CustomAnimate.slideInLeft,
                             exit = CustomAnimate.slideOutRight,
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(Modifier.padding(top = 8.dp)) {
-                                    Column {
-                                        CountryCodePicker {
-                                            countyCodeSelect = it
-                                        }
-                                        if (phoneNumberIsError) {
-                                            Spacer(modifier = Modifier.height(16.dp))
-                                        }
-                                    }
+                            PhoneNumberTextField(
+                                isError = {
+                                    !viewModel.phoneInputValidation(context, it)
+                                        .isNullOrEmpty()
+                                },
+                                validation = {
+                                    viewModel.phoneInputValidation(context, it)
+                                },
+                                onChangeListener = {
+                                    fullPhoneNumber = it
+                                },
+                                onDone = {
+                                    keyboardController?.hide()
                                 }
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Column {
-                                    OutlinedTextField(
-                                        value = phoneNumberText,
-                                        onValueChange = {
-                                            phoneNumberText = it
-                                            phoneNumberIsError =
-                                                !viewModel.phoneInputValidation(context, it)
-                                                    .isNullOrEmpty()
-                                            phoneNumberValidation =
-                                                viewModel.phoneInputValidation(context, it)
-                                        },
-                                        shape = MaterialTheme.shapes.small,
-                                        label = { Text(stringResource(R.string.phone_number)) },
-                                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                                        singleLine = true,
-                                        isError = phoneNumberIsError,
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                                        trailingIcon = {
-                                            if (phoneNumberIsError)
-                                                Icon(
-                                                    Icons.Default.Warning,
-                                                    "error",
-                                                    tint = MaterialTheme.colors.error,
-                                                )
-                                        },
-                                    )
-                                    if (phoneNumberIsError) {
-                                        Text(
-                                            text = phoneNumberValidation
-                                                ?: stringResource(R.string.require),
-                                            color = MaterialTheme.colors.error,
-                                            style = MaterialTheme.typography.caption,
-                                            modifier = Modifier
-                                                .padding(start = 16.dp)
-                                        )
-                                    }
-                                }
-                            }
+                            )
                         }
+
                         AnimatedVisibility(
                             visible = otpTextVisible,
                             enter = CustomAnimate.slideInLeft,
                             exit = CustomAnimate.slideOutRight
                         ) {
-                            Column {
-                                OutlinedTextField(
-                                    value = otpText,
-                                    onValueChange = {
-                                        otpText = it
-                                        otpIsError =
-                                            !viewModel.otpInputValidation(context, it)
-                                                .isNullOrEmpty()
-                                        otpValidation =
-                                            viewModel.otpInputValidation(context, it)
-                                    },
-                                    singleLine = true,
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    shape = MaterialTheme.shapes.small,
-                                    label = { Text(stringResource(R.string.opt_verify_code)) },
-                                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                                    modifier = Modifier.background(MaterialTheme.colors.background),
-                                    trailingIcon = {
-                                        if (otpIsError)
-                                            Icon(
-                                                Icons.Default.Warning,
-                                                "error",
-                                                tint = MaterialTheme.colors.error,
-                                            )
-                                    },
-                                )
-                                if (otpIsError) {
-                                    Text(
-                                        text = otpValidation ?: stringResource(R.string.require),
-                                        color = MaterialTheme.colors.error,
-                                        style = MaterialTheme.typography.caption,
-                                        modifier = Modifier
-                                            .padding(start = 16.dp)
-                                    )
+                            OtpTextField(
+                                isError = {
+                                    !viewModel.otpInputValidation(context, it)
+                                        .isNullOrEmpty()
+                                },
+                                validation = {
+                                    viewModel.otpInputValidation(context, it)
+                                },
+                                onChangeListener = {
+                                    otpText = it
+                                },
+                                onDone = {
+                                    keyboardController?.hide()
                                 }
-                            }
+                            )
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         AnimatedVisibility(
                             visible = btnVerifyVisible,
                             enter = CustomAnimate.slideInRight,
                             exit = CustomAnimate.slideOutRight,
-                            content = {
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
                                 OutlineButtonWithIcon(
-                                    label = if (isSendVerifyBtn) stringResource(R.string.send_verify_code) else stringResource(
-                                        R.string.opt_verify_code
-                                    ),
+                                    label =
+                                    if (isSendVerifyBtn) stringResource(R.string.send_verify_code)
+                                    else stringResource(R.string.opt_verify_code),
                                     icon = R.drawable.phone,
                                     isLoading = signLoading,
                                     onClick = {
-                                        scope.launch {
-                                            if (isSendVerifyBtn) {
-                                                confirmDialog = true
+                                        if (isSendVerifyBtn) {
+                                            keyboardController?.hide()
+                                            confirmDialog = true
+                                            signLoading = true
+                                        } else {
+                                            if (viewModel.otpInputValidation(context, otpText)
+                                                    .isNullOrEmpty()
+                                            ) {
                                                 signLoading = true
-                                            } else {
-                                                signLoading = true
-                                                if (!otpIsError) {
-                                                    viewModel.onVerifyOtpCode(
-                                                        otp = otpText,
-                                                        onSuccess = {
-                                                            signLoading = false
-                                                            navHostController.navigate(
-                                                                ScreenRoute.HomeScreen.route
-                                                            ) {
-                                                                popUpTo(ScreenRoute.HomeScreen.route) {
-                                                                    inclusive = true
-                                                                }
+                                                viewModel.onVerifyOtpCode(
+                                                    otp = otpText,
+                                                    onSuccess = {
+                                                        signLoading = false
+                                                        navHostController.navigate(
+                                                            ScreenRoute.HomeScreen.route
+                                                        ) {
+                                                            popUpTo(ScreenRoute.HomeScreen.route) {
+                                                                inclusive = true
                                                             }
-                                                        },
-                                                        onError = {
-                                                            signLoading = false
-                                                            Toast.makeText(
-                                                                context,
-                                                                "Code invalid",
-                                                                Toast.LENGTH_LONG
-                                                            ).show()
                                                         }
-                                                    )
-                                                }
+                                                    },
+                                                    onError = {
+                                                        signLoading = false
+                                                        Toast.makeText(
+                                                            context,
+                                                            viewModel.codeInvalid(context),
+                                                            Toast.LENGTH_LONG
+                                                        ).show()
+                                                    }
+                                                )
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    viewModel.otpInputValidation(context, otpText),
+                                                    Toast.LENGTH_LONG
+                                                ).show()
                                             }
                                         }
                                     },
                                     modifier = Modifier.width(280.dp)
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                if (isTimerRunning) {
+                                    Row {
+                                        if (timeLeft == 0) {
+                                            TextBtn(
+                                                label = stringResource(R.string.resend_code),
+                                                onClick = {
+                                                    timeOut = 60 * 1000
+                                                    viewModel.onVerifyPhoneNumber(
+                                                        activity = activity,
+                                                        phoneNumber = fullPhoneNumber
+                                                    )
+                                                })
+                                        } else {
+                                            Text(
+                                                text = stringResource(
+                                                    R.string.resend_code_in_sec,
+                                                    timeLeft
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
                             }
-                        )
+
+                        }
                         if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
                             Spacer(modifier = Modifier.height(64.dp))
                         } else {
@@ -317,6 +286,7 @@ fun PhoneSignInScreen(
             }
 
             if (confirmDialog) {
+                val phoneNumber = fullPhoneNumber.split(" ")
                 AlertDialog(
                     onDismissRequest = {
                         confirmDialog = false
@@ -334,20 +304,22 @@ fun PhoneSignInScreen(
                         Text(
                             text = stringResource(
                                 R.string.phone_dialog_content,
-                                countyCodeSelect,
-                                phoneNumberValidation ?: phoneNumberText
+                                phoneNumber[0],
+                                viewModel.phoneInputValidation(context, phoneNumber[1])
+                                    ?: phoneNumber[1]
                             ),
                             style = MaterialTheme.typography.body2
                         )
                     },
                     confirmButton = {
                         TextButton(
-                            enabled = !phoneNumberIsError,
+                            enabled = viewModel.phoneInputValidation(context, phoneNumber[1])
+                                .isNullOrEmpty(),
                             onClick = {
                                 scope.launch {
                                     viewModel.onVerifyPhoneNumber(
                                         activity = activity,
-                                        phoneNumber = "$countyCodeSelect $phoneNumberText"
+                                        phoneNumber = fullPhoneNumber
                                     )
                                     confirmDialog = false
                                     phoneNumberTextVisible = false
@@ -355,6 +327,7 @@ fun PhoneSignInScreen(
                                     otpTextVisible = true
                                     signLoading = false
                                     isSendVerifyBtn = false
+                                    isTimerRunning = true
                                 }
                             }
                         ) {
@@ -371,86 +344,6 @@ fun PhoneSignInScreen(
                             onClick = {
                                 confirmDialog = false
                                 signLoading = false
-                            }
-                        ) {
-                            Text(
-                                stringResource(R.string.cancel),
-                                style = MaterialTheme.typography.button.copy(
-                                    fontFamily = CustomFontFamily.BattambangBold
-                                )
-                            )
-                        }
-                    }
-                )
-            }
-
-            if (getPhoneNumberDialog) {
-                AlertDialog(
-                    onDismissRequest = {
-                        getPhoneNumberDialog = false
-                    },
-                    title = {
-                        Text(
-                            text = "Continue with",
-                            style = MaterialTheme.typography.h6.copy(
-                                fontFamily = CustomFontFamily.BayonRegular,
-                            ),
-                            modifier = Modifier.padding(bottom = 28.dp)
-                        )
-                    },
-                    text = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Card(
-                                shape = CircleShape,
-                                modifier = Modifier
-                                    .size(40.dp),
-                                backgroundColor = Color.Gray
-                            ) {
-                                Box(
-                                    modifier = Modifier.padding(4.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Phone,
-                                        contentDescription = "Phone",
-                                    )
-                                }
-                            }
-                            Spacer(modifier = Modifier.width(20.dp))
-                            Text(
-                                text = simNumber,
-                                style = MaterialTheme.typography.body1.copy(
-                                    fontFamily = CustomFontFamily.BattambangRegular
-                                )
-                            )
-                        }
-                    },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                phoneNumberText = simNumber
-                                phoneNumberIsError =
-                                    !viewModel.phoneInputValidation(context, simNumber)
-                                        .isNullOrEmpty()
-                                phoneNumberValidation =
-                                    viewModel.phoneInputValidation(context, simNumber)
-                                getPhoneNumberDialog = false
-                            }
-                        ) {
-                            Text(
-                                stringResource(R.string.ok),
-                                style = MaterialTheme.typography.button.copy(
-                                    fontFamily = CustomFontFamily.BattambangBold
-                                )
-                            )
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = {
-                                getPhoneNumberDialog = false
                             }
                         ) {
                             Text(

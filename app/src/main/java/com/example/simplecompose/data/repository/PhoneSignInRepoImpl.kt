@@ -15,11 +15,11 @@ class PhoneSignInRepoImpl : PhoneSignInRepo {
         activity: Activity,
         phoneNumber: String,
         firebaseAuth: FirebaseAuth,
-        callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
+        callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks,
     ) {
         val options = PhoneAuthOptions.newBuilder(firebaseAuth)
             .setPhoneNumber(phoneNumber)       // Phone number to verify
-            .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+            .setTimeout(60, TimeUnit.SECONDS) // Timeout and unit
             .setActivity(activity)                 // Activity (for callback binding)
             .setCallbacks(callbacks)          // OnVerificationStateChangedCallbacks
             .build()

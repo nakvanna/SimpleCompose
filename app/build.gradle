@@ -95,6 +95,9 @@ dependencies {
     //Firebase UI
     implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
 
+    //Swiper refresh
+    implementation "com.google.accompanist:accompanist-swiperefresh:0.24.3-alpha"
+
     //Test
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

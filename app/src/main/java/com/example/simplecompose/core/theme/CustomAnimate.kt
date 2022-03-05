@@ -16,21 +16,21 @@ sealed class CustomAnimate {
         // Slide In left / Out Right
         val slideInLeft = slideInHorizontally(
             initialOffsetX = { -it * 2 },
-            animationSpec = tween(durationMillis = 300)
+            animationSpec = tween(durationMillis = 200)
         )
         val slideOutRight = slideOutHorizontally(
             targetOffsetX = { it * 2 },
-            animationSpec = tween(durationMillis = 300)
+            animationSpec = tween(durationMillis = 200)
         )
 
         // Slide In Right / Out Left
         val slideInRight = slideInHorizontally(
             initialOffsetX = { it * 2 },
-            animationSpec = tween(durationMillis = 300)
+            animationSpec = tween(durationMillis = 200)
         )
         val slideOutLeft = slideOutHorizontally(
             targetOffsetX = { -it * 2 },
-            animationSpec = tween(durationMillis = 300)
+            animationSpec = tween(durationMillis = 200)
         )
     }
 }

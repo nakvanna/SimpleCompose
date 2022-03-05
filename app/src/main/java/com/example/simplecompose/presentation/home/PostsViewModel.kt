@@ -2,6 +2,7 @@ package com.example.simplecompose.presentation.home
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,20 +19,31 @@ import javax.inject.Named
 
 @HiltViewModel
 class PostsViewModel @Inject constructor(
-    @Named("get_posts") postsUseCase: GetPosts,
-    @Named("firebase_auth") firebaseAuth: FirebaseAuth,
+    @Named("get_posts") private val postsUseCase: GetPosts,
+    @Named("firebase_auth") private val firebaseAuth: FirebaseAuth,
 ) :
     ViewModel() {
     private val _posts: MutableState<List<PostsQuery.Edge>> = mutableStateOf(ArrayList())
-    val posts get() = _posts
+    val posts: State<List<PostsQuery.Edge>> get() = _posts
 
     private val channel = Channel<Unit>(Channel.CONFLATED)
     private var count = 5
 
     private val _isFetching = mutableStateOf(false)
-    val isFetching get() = _isFetching.value
+    val isFetching: State<Boolean> get() = _isFetching
 
-    private val auth = firebaseAuth
+    private val currentUser = firebaseAuth.currentUser
+    private val _displayName = if (!currentUser?.displayName.isNullOrEmpty()) {
+        currentUser?.displayName
+    } else null
+    val displayName get() = _displayName
+
+    private val _providerRef =
+        if (firebaseAuth.currentUser?.email.isNullOrEmpty()) firebaseAuth.currentUser!!.phoneNumber else firebaseAuth.currentUser!!.email
+    val providerRef get() = _providerRef
+
+    private val _isRefreshing = mutableStateOf(false)
+    val isRefreshing get(): State<Boolean> = _isRefreshing
 
     init {
         channel.trySend(Unit)
@@ -46,7 +58,7 @@ class PostsViewModel @Inject constructor(
                 }
                 val newPosts = response.data?.posts?.edges?.filterNotNull()
                 if (newPosts != null) {
-                    posts.value = newPosts
+                    _posts.value = newPosts
                     _isFetching.value = false
                 }
                 if (count >= response.data?.posts?.count ?: 5) {
@@ -58,8 +70,18 @@ class PostsViewModel @Inject constructor(
         }
     }
 
+    fun refresh() {
+        // This doesn't handle multiple 'refreshing' tasks, don't use this
+        viewModelScope.launch {
+            // A fake 2 second 'refresh'
+            _isRefreshing.value = true
+            delay(2000)
+            _isRefreshing.value = false
+        }
+    }
+    
     fun firebaseSignOut() {
-        auth.signOut()
+        firebaseAuth.signOut()
     }
 
     fun onScrollingPositionChange(index: Int) {

@@ -1,6 +1,7 @@
 package com.example.simplecompose.presentation.settings
 
 import SimpleComposeAppBar
+import android.util.Log
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -9,6 +10,7 @@ import com.example.simplecompose.core.theme.SimpleComposeTheme
 
 @Composable
 fun SettingsScreen(navHostController: NavHostController) {
+    Log.i("Init", "Settings init")
     SimpleComposeTheme {
         Scaffold(
             topBar = {

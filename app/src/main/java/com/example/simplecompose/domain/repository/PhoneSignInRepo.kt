@@ -11,7 +11,7 @@ interface PhoneSignInRepo {
         activity: Activity,
         phoneNumber: String,
         firebaseAuth: FirebaseAuth,
-        callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
+        callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks,
     )
 
     suspend fun verifyOtpCode(

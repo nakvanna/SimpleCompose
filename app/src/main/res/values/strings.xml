@@ -25,4 +25,7 @@
     <string name="require">Require</string>
     <string name="html_text" translatable="false">%1$s</string>
     <string name="hello">Hello</string>
+    <string name="resend_code">Resend Code</string>
+    <string name="resend_code_in_sec">Resend code in %1$d sec</string>
+    <string name="code_invalid">Code invalid</string>
 </resources>

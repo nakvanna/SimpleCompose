@@ -24,5 +24,8 @@
     <string name="must_be_9_or_10_char">លេខទូរសព្ទយ៉ាងតិច ៩ ទៅ ១០ ខ្ទង់</string>
     <string name="code_must_be_6_char">លេខកូដត្រូវតែ ៦ ខ្ទង់</string>
     <string name="require">តម្រូវការ</string>
-    <string name="hello">Hello</string>
+    <string name="hello">សួរស្ដី</string>
+    <string name="resend_code">ផ្ញើរលេខកូដម្ដងទៀត</string>
+    <string name="resend_code_in_sec">ផ្ញើរលេខកូដម្ដងទៀត %1$d វិនាទី</string>
+    <string name="code_invalid">លេខកូដមិនត្រឹមត្រូវ</string>
 </resources>

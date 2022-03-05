@@ -1,5 +1,6 @@
 package com.example.simplecompose.presentation.auth.phone
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.util.Log
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 
+@SuppressLint("HardwareIds")
 @HiltViewModel
 class PhoneSignInViewModel @Inject constructor(
     @Named("verify_phone_number") private val verifyPhoneNumberUseCase: VerifyPhoneNumber,
@@ -30,8 +32,15 @@ class PhoneSignInViewModel @Inject constructor(
     private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
     private var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
 
+    var autoSignInCredentialSuccess: () -> Unit = {
+        Log.i("Phone", "Success not working")
+    }
+    var autoSignInCredentialFailure: () -> Unit = {
+        Log.i("Phone", "Failure not working")
+    }
+
     init {
-        firebaseAuth.setLanguageCode("en")
+        firebaseAuth.setLanguageCode("kh")
 
         callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
@@ -46,9 +55,9 @@ class PhoneSignInViewModel @Inject constructor(
                 viewModelScope.launch {
                     firebaseAuth.signInWithCredential(credential).addOnCompleteListener {
                         if (it.isSuccessful) {
-                            Log.i("Phone", "Auto sign in with credential successful")
+                            autoSignInCredentialSuccess()
                         } else {
-                            Log.i("Phone", "Auto sign in with credential failure")
+                            autoSignInCredentialFailure()
                         }
                     }
                 }
@@ -113,7 +122,6 @@ class PhoneSignInViewModel @Inject constructor(
         }
     }
 
-
     fun phoneInputValidation(context: Context, value: String): String? {
         val validRange = value.length !in 9..10
         if (!Patterns.PHONE.matcher(value).matches()) {
@@ -131,4 +139,6 @@ class PhoneSignInViewModel @Inject constructor(
         }
         return null
     }
+
+    fun codeInvalid(context: Context) = context.getString(R.string.code_invalid)
 }

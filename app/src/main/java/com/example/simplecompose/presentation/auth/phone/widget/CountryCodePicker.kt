@@ -23,7 +23,7 @@ import androidx.compose.ui.window.Dialog
 import com.example.simplecompose.R
 import com.example.simplecompose.core.theme.CustomFontFamily
 import com.example.simplecompose.domain.model.CountryCodeItem
-import com.example.simplecompose.ui.widgets.TextBtn
+import com.example.simplecompose.ui.widget.TextBtn
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -31,7 +31,7 @@ import java.util.*
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CountryCodePicker(
-    onClick: (String) -> Unit
+    onSelectChange: (String) -> Unit
 ) {
     val options: List<CountryCodeItem> = listOf(
         CountryCodeItem(
@@ -132,7 +132,7 @@ fun CountryCodePicker(
                                             onClick = {
                                                 scope.launch {
                                                     onOptionSelected(option)
-                                                    onClick(option.dialCode)
+                                                    onSelectChange(option.dialCode)
                                                     delay(200)
                                                     openDialog = false
                                                 }
