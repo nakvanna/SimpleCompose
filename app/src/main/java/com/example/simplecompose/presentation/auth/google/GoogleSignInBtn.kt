@@ -8,9 +8,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.simplecompose.R
-import com.example.simplecompose.domain.use_case.google.SignInGoogle
 import com.example.simplecompose.presentation.ScreenRoute
 import com.example.simplecompose.ui.widget.OutlineButtonWithIcon
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -20,11 +20,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun GoogleSignInBtn(
     navHostController: NavHostController,
+    viewModel: GoogleSignInViewModel = hiltViewModel()
 ) {
-    val clientId = stringResource(R.string.default_web_client_id)
     val context = LocalContext.current
     val activity = context as Activity
-    val signInGoogle = SignInGoogle(activity = activity, clientId = clientId)
     val scope = rememberCoroutineScope()
     var isLoading by remember {
         mutableStateOf(false)
@@ -39,13 +38,15 @@ fun GoogleSignInBtn(
                     val account = task.getResult(ApiException::class.java)!!
 
                     scope.launch {
-                        signInGoogle.firebaseAuthWithCredential(
+                        viewModel.firebaseAuthWithCredential(
                             idToken = account.idToken!!,
-                        ).addOnCompleteListener(activity) {
-                            isLoading = !it.isSuccessful
-                            navHostController.navigate(ScreenRoute.HomeScreen.route) {
-                                popUpTo(ScreenRoute.HomeScreen.route) {
-                                    inclusive = true
+                        ).addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                isLoading = !it.isSuccessful
+                                navHostController.navigate(ScreenRoute.HomeScreen.route) {
+                                    popUpTo(ScreenRoute.HomeScreen.route) {
+                                        inclusive = true
+                                    }
                                 }
                             }
                         }
@@ -61,7 +62,7 @@ fun GoogleSignInBtn(
         }
 
     suspend fun googleSignIn() {
-        launcherForActivityResult.launch(signInGoogle.googleSignInIntent())
+        launcherForActivityResult.launch(viewModel.googleSignInIntent(activity))
     }
     OutlineButtonWithIcon(
         label = stringResource(R.string.sign_with_google),
@@ -72,7 +73,6 @@ fun GoogleSignInBtn(
                 isLoading = true
                 googleSignIn()
             }
-            // navHostController.navigate(ScreenRoute.HomeScreen.route)
         },
         isLoading = isLoading
     )
