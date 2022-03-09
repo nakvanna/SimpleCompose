@@ -79,7 +79,7 @@ class PostsViewModel @Inject constructor(
             _isRefreshing.value = false
         }
     }
-    
+
     fun firebaseSignOut() {
         firebaseAuth.signOut()
     }

@@ -44,7 +44,8 @@ fun HomeScreen(
                     state = scaffoldState,
                     navHostController = navHostController,
                     displayName = viewModel.displayName ?: "Not Provide",
-                    providerRef = viewModel.providerRef ?: "Nothing"
+                    providerRef = viewModel.providerRef ?: "Nothing",
+                    tokenId = "Token"
                 )
             },
             topBar = {
@@ -64,8 +65,8 @@ fun HomeScreen(
                     actions = {
                         OverflowMenu(navHostController, signOut = {
                             viewModel.firebaseSignOut()
-                            navHostController.navigate(ScreenRoute.LoginScreen.route) {
-                                popUpTo(ScreenRoute.LoginScreen.route) {
+                            navHostController.navigate(ScreenRoute.AuthScreen.route) {
+                                popUpTo(ScreenRoute.HomeScreen.route) {
                                     inclusive = true
                                 }
                             }

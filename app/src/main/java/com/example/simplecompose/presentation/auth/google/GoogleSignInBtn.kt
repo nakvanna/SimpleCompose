@@ -44,7 +44,7 @@ fun GoogleSignInBtn(
                             if (it.isSuccessful) {
                                 isLoading = !it.isSuccessful
                                 navHostController.navigate(ScreenRoute.HomeScreen.route) {
-                                    popUpTo(ScreenRoute.HomeScreen.route) {
+                                    popUpTo(ScreenRoute.AuthScreen.route) {
                                         inclusive = true
                                     }
                                 }

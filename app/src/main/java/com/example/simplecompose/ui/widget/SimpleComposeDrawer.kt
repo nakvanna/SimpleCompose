@@ -28,6 +28,7 @@ fun SimpleComposeDrawer(
     navHostController: NavHostController,
     displayName: String,
     providerRef: String,
+    tokenId: String
 ) {
     val scope = rememberCoroutineScope()
     Box {
@@ -58,6 +59,7 @@ fun SimpleComposeDrawer(
                     bottom = 22.dp,
                 )
             )
+            Text(text = tokenId)
             Divider()
             DrawerListMenuItem(
                 items = listOf(

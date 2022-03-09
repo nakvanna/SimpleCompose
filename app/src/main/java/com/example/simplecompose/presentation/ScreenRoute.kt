@@ -1,7 +1,7 @@
 package com.example.simplecompose.presentation
 
 sealed class ScreenRoute(val route: String) {
-    object LoginScreen : ScreenRoute("login_screen")
+    object AuthScreen : ScreenRoute("auth_screen")
     object HomeScreen : ScreenRoute("home_screen")
     object SettingsScreen : ScreenRoute("settings_screen")
     object AboutScreen : ScreenRoute("about_screen")

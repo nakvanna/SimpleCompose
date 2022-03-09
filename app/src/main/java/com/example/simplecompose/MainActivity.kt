@@ -56,7 +56,7 @@ fun Navigation(
     isLogin: Boolean,
 ) {
     AnimatedNavHost(
-        startDestination = if (isLogin) ScreenRoute.HomeScreen.route else ScreenRoute.LoginScreen.route,
+        startDestination = if (isLogin) ScreenRoute.HomeScreen.route else ScreenRoute.AuthScreen.route,
         navController = navHostController,
         enterTransition = {
             CustomAnimate.slideInRight
@@ -65,7 +65,7 @@ fun Navigation(
             CustomAnimate.scaleIn
         }
     ) {
-        composable(route = ScreenRoute.LoginScreen.route) {
+        composable(route = ScreenRoute.AuthScreen.route) {
             AuthScreen(navHostController)
         }
         composable(route = ScreenRoute.HomeScreen.route) {
